@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phishing Detection System</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f3f6fb;color:#172033}
+header{background:#142b4a;color:white;padding:28px 18px;text-align:center}header h1{margin:0 0 8px;font-size:26px}header p{margin:0;color:#d6e3f3}
+main{max-width:900px;margin:24px auto;padding:0 16px}.panel{background:white;border-radius:12px;padding:22px;margin-bottom:18px;box-shadow:0 3px 14px #162b4610}
+h2{margin-top:0;font-size:20px}label{display:block;font-weight:bold;margin:14px 0 6px}input,textarea{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:7px;font:inherit}textarea{min-height:120px;resize:vertical}
+button{background:#1765b1;color:white;border:0;padding:11px 17px;border-radius:7px;font-weight:bold;cursor:pointer;margin:12px 8px 0 0}button.secondary{background:#e7eef7;color:#18324f}.result{display:none;margin-top:18px;padding:16px;border-radius:8px;background:#f1f5f9}.score{font-size:25px;font-weight:bold}.high{color:#b42318}.medium{color:#a15c00}.low{color:#16803c}li{margin:8px 0;overflow-wrap:anywhere}.note{color:#58677d;font-size:13px;line-height:1.5}footer{text-align:center;color:#65748b;padding:12px 18px 28px}
+</style></head>
+<body>
+<header><h1>Phishing Attack Simulation & Detection</h1><p>Educational email and URL safety checker</p></header>
+<main>
+<section class="panel"><h2>1. Email Detection</h2><p class="note">Sample ya training email paste karein. Is demo mein data local computer par analyse hota hai; email send nahi hota.</p>
+<label for="sender">Sender email</label><input id="sender" placeholder="example@company.com">
+<label for="subject">Email subject</label><input id="subject" placeholder="Your account notification">
+<label for="body">Email body / URL</label><textarea id="body" placeholder="Email ka text yahan paste karein..."></textarea>
+<button onclick="scan()">Analyse Email</button><button class="secondary" onclick="sample()">Load Training Sample</button><button class="secondary" onclick="clearForm()">Clear</button>
+<div class="result" id="result" aria-live="polite"></div></section>
+<section class="panel"><h2>2. Phishing Awareness Quiz</h2><p id="question">A message asks you to share an OTP to prevent account suspension. What should you do?</p>
+<div><button class="secondary" onclick="answer(false)">Share the OTP</button><button class="secondary" onclick="answer(true)">Do not share; verify through the official app/site</button></div><p id="quizFeedback" aria-live="polite"></p></section>
+<section class="panel"><h2>3. Safety Tips</h2><ul><li>Sender ka complete email address carefully check karein.</li><li>Unexpected links par click karne se pehle domain verify karein.</li><li>OTP, password, PIN ya CVV kisi ke saath share na karein.</li><li>Suspicious message ko official support channel se verify karein.</li><li>Multi-factor authentication enable rakhein.</li></ul></section>
+<p class="note">Disclaimer: This is a basic rule-based educational demonstration, not a commercial anti-phishing product. A low score does not prove that an email is safe.</p>
+</main><footer>Python Cybersecurity Mini Project</footer>
+<script>
+async function scan(){const payload={sender:document.getElementById('sender').value,subject:document.getElementById('subject').value,body:document.getElementById('body').value};const box=document.getElementById('result');box.style.display='block';box.textContent='Analysing...';try{const r=await fetch('/scan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const d=await r.json();if(!r.ok)throw new Error(d.error||'Request failed');const cls=d.level==='High Risk'?'high':d.level==='Medium Risk'?'medium':'low';box.innerHTML=`<div class="score ${cls}">${d.level} — ${d.score}/100</div><h3>Detection findings</h3><ul>${d.findings.map(x=>`<li>${escapeHtml(x)}</li>`).join('')}</ul><p><b>Advice:</b> ${escapeHtml(d.advice)}</p><p class="note">Risk score heuristic hai; final decision ke liye sender aur website independently verify karein.</p>`;}catch(e){box.textContent='Error: '+e.message;}}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function sample(){document.getElementById('sender').value='security-alert@example.test';document.getElementById('subject').value='Urgent action: verify your account';document.getElementById('body').value='Your account may be suspended. Verify your account immediately and confirm your password at http://192.0.2.10/account';}
+function clearForm(){['sender','subject','body'].forEach(id=>document.getElementById(id).value='');document.getElementById('result').style.display='none';}
+function answer(correct){document.getElementById('quizFeedback').textContent=correct?'Correct. Never share OTPs; verify requests using the official app or website.':'Incorrect. Never share an OTP. Verify the message independently using the official app or website.';}
+</script></body></html>
